@@ -1,12 +1,12 @@
-# token:1337741156:AAEAXiceoDUDxtQloBS1L3_rYp9SpWUnhc
-# token:1431032404:AAFL8WHpn2dJryplX4Bc5oUA3iiWj9WjfqA
 from telebot import types
 from config import bot, updateId
-from isLogged import menu
+from handlers import mainMenu
 from SQLite import SQLreg
 
+name, skills, lowSkills = '', '', ''
+age, courses = 0, 0
 
-#@bot.message_handler(func=lambda m: True, content_types=['text'])
+
 def start(message):
     bot.send_message(message.from_user.id, "Привет, как тебя зовут?")
     bot.register_next_step_handler(message, name_register)
@@ -75,10 +75,9 @@ def result(message):
 def answer(message):
     if message.text == "Да":
         user_id = updateId(message)
-        print(user_id)
         SQLreg(user_id, name, skills, lowSkills, age, course)
-        menu(message)
         bot.send_message(message.from_user.id, "Приятно познакомиться, я записал тебя в БД :)")
+        mainMenu(message)
 
     elif message.text == "Нет":
         bot.send_message(message.from_user.id, "Давай попробуем еще раз!")
