@@ -1,26 +1,19 @@
-from reg import *
-import telebot
-from telebot import types
+from config import bot, updateId
+from reg import start
+from SQLite import botStart, registration
+from isLogged import menu
 
-print(info)
 
-bot = telebot.TeleBot("1431032404:AAFL8WHpn2dJryplX4Bc5oUA3iiWj9WjfqA")
-
-bot.get_me()
-
-@bot.message_handler(commands=['menu'])
-def menu(message):
-    keyboard = types.ReplyKeyboardMarkup()
-    key_goTask = types.InlineKeyboardButton(text = "Выполнить задание")
-    keyboard.add(key_goTask)
-    key_addTask = types.InlineKeyboardButton(text = "Дать задание")
-    keyboard.add(key_addTask)
-    key_information = types.InlineKeyboardButton(text = "Информация о профиле")
-    keyboard.add(key_information)
-    key_message = types.InlineKeyboardButton(text = "Сообщения")
-    keyboard.add(key_message)
-    bot.send_message(message.from_user.id, "Выбирай!", reply_markup = keyboard)
-
+@bot.message_handler(commands=['start'])
+def welcome(message):
+    user_id = updateId(message)
+    print(user_id)
+    botStart()
+    if registration(user_id):
+        start(message)
+    else:
+        bot.send_message(message.from_user.id, "Рады видеть тебя вновь")
+        menu(message)
 
 
 bot.polling()

@@ -1,9 +1,8 @@
 import telebot
 
+
+TOKEN = "1431032404:AAGS9MagsZ9mVTKGk9rluaAYpdOA-ZQOQ_M"
 bot = telebot.TeleBot(TOKEN)
 
-
-
-TOKEN = "1431032404:AAFL8WHpn2dJryplX4Bc5oUA3iiWj9WjfqA"
-
-bot.polling()
+def updateId(message):
+    return message.from_user.id

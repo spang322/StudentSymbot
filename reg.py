@@ -1,34 +1,27 @@
-import telebot
-from telebot import types
-
 # token:1337741156:AAEAXiceoDUDxtQloBS1L3_rYp9SpWUnhc
-name = ''
-age = 0
-course = 0
-skills = ""
-lowSkills = ""
-
-bot = telebot.TeleBot("1431032404:AAFL8WHpn2dJryplX4Bc5oUA3iiWj9WjfqA")
-
-print(bot.get_me())
-
-@bot.message_handler(commands=['start'])
-def welcome(message):
-    bot.send_message(message.from_user.id, "Привет, как тебя зовут ?")
+# token:1431032404:AAFL8WHpn2dJryplX4Bc5oUA3iiWj9WjfqA
+from telebot import types
+from config import bot, updateId
+from isLogged import menu
+from SQLite import SQLreg
 
 
-@bot.message_handler(func=lambda m: True, content_types=['text'])
+#@bot.message_handler(func=lambda m: True, content_types=['text'])
+def start(message):
+    bot.send_message(message.from_user.id, "Привет, как тебя зовут?")
+    bot.register_next_step_handler(message, name_register)
+
+
 def name_register(message):
-    if age == 0:
-        global name
-        name = message.text
-        bot.send_message(message.from_user.id, "Окей, сколько тебе лет?")
-        bot.register_next_step_handler(message, age_reg)
+    global name
+    name = message.text
+    bot.send_message(message.from_user.id, "Окей, сколько тебе лет?")
+    bot.register_next_step_handler(message, age_reg)
 
 
 def age_reg(message):
     global age
-    while age == 0:
+    while True:
         try:
             age = int(message.text)
         except ValueError:
@@ -44,7 +37,7 @@ def age_reg(message):
 
 def course_reg(message):
     global course
-    while course == 0:
+    while True:
         try:
             course = int(message.text)
         except ValueError:
@@ -81,21 +74,13 @@ def result(message):
 
 def answer(message):
     if message.text == "Да":
-        keyboard = types.ReplyKeyboardMarkup()
-        key_menu = types.InlineKeyboardButton(text="/menu")
-        keyboard.add(key_menu)
+        user_id = updateId(message)
+        print(user_id)
+        SQLreg(user_id, name, skills, lowSkills, age, course)
+        menu(message)
         bot.send_message(message.from_user.id, "Приятно познакомиться, я записал тебя в БД :)")
-        bot.send_message(message.from_user.id, "Нажми на кнопку '/menu' для того, чтоб узнать возможности бота!",
-                         reply_markup=keyboard)
-        bot.stop_polling()
 
     elif message.text == "Нет":
-        global name, skills, lowSkills, age, course
-        name, skills, lowSkills = '', '', ''
-        age, course = 0, 0
         bot.send_message(message.from_user.id, "Давай попробуем еще раз!")
         bot.send_message(message.from_user.id, "Как тебя зовут ?")
         bot.register_next_step_handler(message, name_register)
-
-
-bot.polling()
