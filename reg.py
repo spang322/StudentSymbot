@@ -4,7 +4,7 @@ from handlers import mainMenu
 from SQLite import SQLreg
 
 name, skills, lowSkills = '', '', ''
-age, courses = 0, 0
+age, course = 0, 0
 
 
 def start(message):
@@ -46,40 +46,31 @@ def course_reg(message):
         finally:
             break
     if course != 0:
-        bot.send_message(message.from_user.id, "А что ты умеешь? Опиши вкратце!")
-        bot.register_next_step_handler(message, skills_reg)
-
-
-def skills_reg(message):
-    global skills
-    skills = message.text
-    bot.send_message(message.from_user.id, "Осталось совсем немного) А в чем ты слаб ?")
-    bot.register_next_step_handler(message, result)
+        bot.register_next_step_handler(message, result)
 
 
 def result(message):
-    global lowSkills
-    lowSkills = message.text
+    global url
+    url = message.text
     bot.send_message(message.from_user.id,
-                     "Получается, тебя зовут " + name + "\nТвой возраст: " + str(age) + "\nТы учишься на " + str(
-                         course) + " курсе" + "\nТвоя биография:" + "\n" + skills + "\n" + lowSkills)
+                     "Получается, тебя зовут " + name + "\nТвой возраст: " + str(age) +
+                     "\nТы учишься на " + str(course) + " курсе")
     keyboard = types.ReplyKeyboardMarkup()
-    key_yes = types.InlineKeyboardButton(text="Да")
+    keyButton = types.InlineKeyboardButton(text="Да")
     keyboard.add(key_yes)
-    key_no = types.InlineKeyboardButton(text="Нет")
+    keyButton = types.InlineKeyboardButton(text="Нет")
     keyboard.add(key_no)
-    bot.send_message(message.from_user.id, text="Все верно ?", reply_markup=keyboard)
+    bot.send_message(message.from_user.id, text="Все верно?", reply_markup=keyboard)
     bot.register_next_step_handler(message, answer)
 
 
 def answer(message):
     if message.text == "Да":
         user_id = updateId(message)
-        SQLreg(user_id, name, skills, lowSkills, age, course)
-        bot.send_message(message.from_user.id, "Приятно познакомиться, я записал тебя в БД :)")
+        SQLreg(user_id, name, url, age, course)
+        bot.send_message(message.from_user.id, "Приятно познакомиться")
         mainMenu(message)
 
     elif message.text == "Нет":
-        bot.send_message(message.from_user.id, "Давай попробуем еще раз!")
-        bot.send_message(message.from_user.id, "Как тебя зовут ?")
+        bot.send_message(message.from_user.id, "Давай попробуем еще раз!\nКак тебя зовут?")
         bot.register_next_step_handler(message, name_register)
